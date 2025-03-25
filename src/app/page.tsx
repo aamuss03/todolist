@@ -10,7 +10,7 @@ import {
   doc,
   updateDoc,
 } from 'firebase/firestore';
-import { db } from '../lib/firebase';
+import { db } from '../app/lib/firebase';
 
 type Task = {
   id: string;
