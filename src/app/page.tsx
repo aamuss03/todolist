@@ -1,9 +1,7 @@
 'use client';
-
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Swal from 'sweetalert2';
-import { format } from 'date-fns';
 import {
   collection,
   addDoc,
@@ -21,11 +19,12 @@ type Task = {
   deadline: string;
 };
 
-export default function TodoPage() {
+export default function TodoList() {
   const [tasks, setTasks] = useState<Task[]>([]);
-  const [timeRemaining, setTimeRemaining] = useState<{ [key: string]: string }>({});
+  const [timeRemaining, setTimeRemaining] = useState<{ [key: string]: string }>(
+    {}
+  );
 
-  // Ambil data dari Firestore saat pertama kali komponen di-mount
   useEffect(() => {
     const fetchTasks = async () => {
       const querySnapshot = await getDocs(collection(db, 'tasks'));
@@ -38,10 +37,7 @@ export default function TodoPage() {
     fetchTasks();
   }, []);
 
-  // Perbarui countdown setiap detik setelah tasks tersedia
   useEffect(() => {
-    if (tasks.length === 0) return; // Hindari menjalankan interval sebelum tasks ada
-
     const interval = setInterval(() => {
       const newTimeRemaining: { [key: string]: string } = {};
       tasks.forEach((task) => {
@@ -51,7 +47,7 @@ export default function TodoPage() {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [tasks]); // Dependensi `tasks` agar interval hanya berjalan jika ada data
+  }, [tasks]);
 
   const calculateTimeRemaining = (deadline: string): string => {
     const deadlineTime = new Date(deadline).getTime();
@@ -131,8 +127,8 @@ export default function TodoPage() {
             const taskColor = task.completed
               ? 'bg-green-200'
               : isExpired
-                ? 'bg-red-200'
-                : 'bg-yellow-200';
+              ? 'bg-red-200'
+              : 'bg-yellow-200';
 
             return (
               <motion.li
@@ -146,10 +142,11 @@ export default function TodoPage() {
                 <div className="flex justify-between items-center">
                   <span
                     onClick={() => toggleTask(task.id)}
-                    className={`cursor-pointer transition-500 ${task.completed
-                      ? 'line-through text-gray-500'
-                      : 'font-semibold text-gray-700'
-                      }`}
+                    className={`cursor-pointer transition-500 ${
+                      task.completed
+                        ? 'line-through text-gray-500'
+                        : 'font-semibold text-gray-700'
+                    }`}
                   >
                     {task.text}
                   </span>
@@ -161,7 +158,7 @@ export default function TodoPage() {
                   </button>
                 </div>
                 <p className="text-sm text-gray-700">
-                  Deadline: {format(new Date(task.deadline), 'yyyy-MM-dd HH:mm')}
+                  Deadline: {new Date(task.deadline).toLocaleString()}
                 </p>
                 <p className="text-xs font-semibold text-gray-700">
                   ⏳ {timeRemaining[task.id] || 'Menghitung...'}
